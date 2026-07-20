@@ -47,8 +47,8 @@ final List<Widget> _screens = [
   const DashboardView(),
   const ConductoresGestionView(),
   const VehiculosGestionView(),
-  const ReportesFinancierosView(), // Nueva vista integrada
-  const Center(child: Text('Vista de Configuración en construcción')),
+  const ReportesFinancierosView(),
+  const ConfiguracionView(), // <-- Aquí la nueva integración
 ];
 
   @override
@@ -500,4 +500,91 @@ class ReportesFinancierosView extends StatelessWidget {
       ),
     );
   }
+}
+class ConfiguracionView extends StatelessWidget {
+  const ConfiguracionView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("Configuración del Sistema", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 20),
+          // Usamos LayoutBuilder para que sea responsivo como tu Dashboard
+          LayoutBuilder(builder: (context, constraints) {
+            int crossAxisCount = constraints.maxWidth > 900 ? 3 : 2;
+            return GridView.count(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              childAspectRatio: 1.5, // Ajusta la altura de las tarjetas
+              children: [
+                _configCard(context, "Parámetros Operativos", Icons.tune, Colors.blue),
+                _configCard(context, "Gestión de Usuarios", Icons.admin_panel_settings, Colors.purple),
+                _configCard(context, "Notificaciones", Icons.notifications_active, Colors.orange),
+                _configCard(context, "Integraciones API", Icons.api, Colors.teal),
+                _configCard(context, "Mantenimiento", Icons.build, Colors.red),
+              ],
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  Widget _configCard(BuildContext context, String title, IconData icon, Color color) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: () => _openConfigModal(context, title),
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 40, color: color),
+              const SizedBox(height: 12),
+              Text(title, 
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Al hacer clic, abrimos un diálogo limpio (modal) para editar
+  void _openConfigModal(BuildContext context, String title) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Configurar: $title"),
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const TextField(decoration: InputDecoration(labelText: "Valor 1")),
+              const SizedBox(height: 10),
+              const TextField(decoration: InputDecoration(labelText: "Valor 2")),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cerrar")),
+          ElevatedButton(onPressed: () {}, child: const Text("Guardar")),
+        ],
+      ),
+    );
+  }
+}
 }
